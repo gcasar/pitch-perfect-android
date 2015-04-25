@@ -1,5 +1,6 @@
 package si.bbd.pitch_perfect;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +13,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        startService(new Intent(this,AudioStreamService.class ));
     }
 
 
@@ -29,9 +32,11 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_start) {
+            startService(new Intent(this,AudioStreamService.class ));
             return true;
+        }else if(id == R.id.action_stop){
+            stopService(new Intent(this,AudioStreamService.class ));
         }
 
         return super.onOptionsItemSelected(item);
