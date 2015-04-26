@@ -1,6 +1,7 @@
 package si.bbd.pitch_perfect;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
@@ -18,7 +19,6 @@ public class AudioStreamService extends Service{
     CircularBuffer buffer = new CircularBuffer(1440, 1000);
 
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -27,7 +27,8 @@ public class AudioStreamService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         recorder = new StreamRecorder(buffer);
-        player = new StreamPlayer(buffer);
+        StreamPlayer.clearInstance();
+        player = StreamPlayer.getInstance(buffer);
 
         recorder.start();
         player.start();

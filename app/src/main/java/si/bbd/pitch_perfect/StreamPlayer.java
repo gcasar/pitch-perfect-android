@@ -1,5 +1,6 @@
 package si.bbd.pitch_perfect;
 
+import si.bbd.pitch_perfect.util.AudioManipulator;
 import si.bbd.pitch_perfect.util.Buffer;
 import si.bbd.pitch_perfect.util.CircularBuffer;
 import si.bbd.pitch_perfect.util.Constants;
@@ -16,6 +17,15 @@ import android.util.Log;
  *
  */
 public class StreamPlayer extends Thread {
+
+    protected static StreamPlayer instance;
+    public static StreamPlayer getInstance(CircularBuffer buffer){
+        if(instance == null)instance = new StreamPlayer(buffer);
+        return instance;
+    }
+    public static void clearInstance(){
+        instance = null;
+    }
 	
 	
 	private static final String TAG = "StreamRecorder";
@@ -25,6 +35,9 @@ public class StreamPlayer extends Thread {
 	boolean mIsRunning=true;
 	
 	private int mSampleRate = Constants.SAMPLE_RATE;
+
+    //float gainFactor = (float)Math.pow( 10., dB / 20. );
+    private float mGainFactor = 1;
 	
 	Buffer mActiveBuffer;
 	
@@ -32,7 +45,7 @@ public class StreamPlayer extends Thread {
 
 	private Callback mListener;
 	
-	public StreamPlayer(CircularBuffer buffer){
+	protected StreamPlayer(CircularBuffer buffer){
 		mBuffer = buffer;
 	}
 	
@@ -85,6 +98,7 @@ public class StreamPlayer extends Thread {
 
 
         	mActiveBuffer = mBuffer.getNextRead();
+
             while(mActiveBuffer==null){
             	
             	try {
@@ -94,6 +108,8 @@ public class StreamPlayer extends Thread {
 				}
             	mActiveBuffer = mBuffer.getNextRead();
             }
+            AudioManipulator.gain(mActiveBuffer, buffersize / 2, mGainFactor);
+            //AudioManipulator.cut(mActiveBuffer,buffersize/2, -200,200);
 
             mPlayer.write(mActiveBuffer.data, 0, buffersize/2);
              //mPlayer.flush();
@@ -106,9 +122,20 @@ public class StreamPlayer extends Thread {
         Log.i(TAG, "player exit");
 		
 	}
-	
 
-	public void setCallback(Callback listener) {
+    public float getGainFactor() {
+        return mGainFactor;
+    }
+
+    public void setGainFactor(float gain) {
+        this.mGainFactor = gain;
+    }
+
+    public void setGain(float dB){
+        mGainFactor = (float)Math.pow( 10., dB / 20. );
+    }
+
+    public void setCallback(Callback listener) {
 		this.mListener = listener;
 	}
 	

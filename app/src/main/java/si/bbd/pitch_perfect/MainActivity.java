@@ -3,11 +3,16 @@ package si.bbd.pitch_perfect;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private float mGain_dB = 6;
+    private Toast mToast = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +41,37 @@ public class MainActivity extends ActionBarActivity {
             startService(new Intent(this,AudioStreamService.class ));
             return true;
         }else if(id == R.id.action_stop){
-            stopService(new Intent(this,AudioStreamService.class ));
+            stopService(new Intent(this, AudioStreamService.class));
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch(keyCode){
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                changeGain(-1);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                changeGain(+1);
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void changeGain(float delta_dB){
+        mGain_dB+=delta_dB;
+        StreamPlayer.getInstance(null).setGain(mGain_dB);
+        showToast("dB: "+mGain_dB);
+    }
+
+
+    public void showToast(String text){
+        if(mToast==null){
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        }
+        mToast.setText(text);
+        mToast.show();
     }
 }
