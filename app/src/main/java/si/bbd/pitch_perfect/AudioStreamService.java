@@ -26,9 +26,14 @@ public class AudioStreamService extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+
         recorder = new StreamRecorder(buffer);
         StreamPlayer.clearInstance();
         player = StreamPlayer.getInstance(buffer);
+        if(intent.hasExtra("GAIN_dB")){
+            player.setGain(intent.getFloatExtra("GAIN_dB", 0));
+        }
 
         recorder.start();
         player.start();

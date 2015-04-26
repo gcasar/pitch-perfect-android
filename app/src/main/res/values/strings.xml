@@ -5,4 +5,5 @@
     <string name="action_settings">Settings</string>
     <string name="action_stop">Stop</string>
     <string name="action_start">Start</string>
+    <string name="title_activity_charities">Hearing loss related charities &amp; events</string>
 </resources>
